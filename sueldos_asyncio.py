@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from bs4 import BeautifulSoup
 import requests
+import csv
 import time
 import asyncio
 from aiohttp import ClientSession
@@ -57,8 +58,7 @@ def main(url):
     puesto_vasallo = soup.find('div', {'class' : 'entry-content'}).h2.text
     salario_vasallo = soup.find('strong').find_parent().text
     anual_vasallo = soup.find('strong').find_parent().find_next_sibling().text
-    referidos.append(f"El vasallo cobra:\n {salario_vasallo} actuando como {puesto_vasallo}")
-    referidos.append(f"Anualmente\n {anual_vasallo}.")
+    referidos.append([salario_vasallo,puesto_vasallo, anual_vasallo, nombre_vasallo])
 
 def fetch_async(urls):
     """ Function who coordinates the coroutines """
@@ -91,4 +91,8 @@ if __name__=='__main__':
     fetch_async(referencias)
     elapsed = time.perf_counter() - s
     print(f"{__file__} executed in {elapsed:0.2f} seconds.")
+    with open('output.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Nombre", "Puesto", "Salario", "Anual"])
+        writer.writerows(referidos)
 #30 seconds more or less
